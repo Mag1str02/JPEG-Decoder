@@ -33,3 +33,7 @@ target_include_directories(test_jpeg_decoder PUBLIC include)
 target_link_libraries(test_jpeg_decoder jpeg_decoder)
 target_compile_definitions(test_jpeg_decoder PUBLIC IMAGE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Images/")
 
+set(JPEG_DECODER_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/Include)
+set(JPEG_DECODER_LIBRARY jpeg_decoder)
+
+message(STATUS "JPEG Decoder includes: ${JPEG_DECODER_INCLUDES}")
