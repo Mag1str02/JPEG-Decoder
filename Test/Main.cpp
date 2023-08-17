@@ -100,7 +100,7 @@ bool CheckImage(const std::string& filename, const std::string& expected_comment
     return Compare(image, ok_image);
 }
 
-void TestImage(const std::string& filename, const std::string& expected_comment = "", bool expect_error = false)
+bool TestImage(const std::string& filename, const std::string& expected_comment = "", bool expect_error = false)
 {
     std::chrono::steady_clock::time_point begin, end;
     bool                                  result;
@@ -129,26 +129,52 @@ void TestImage(const std::string& filename, const std::string& expected_comment 
         std::cout << "Test failed: (" << filename << ")"
                   << " Because: (" << error << ")" << std::endl;
     }
+    return result ^ expect_error;
 }
+
+struct TestCase
+{
+    std::string file;
+    std::string expected_comment = "";
+    bool        expect_error     = false;
+};
 
 int main()
 {
-    TestImage("small.jpg", ":)");
-    TestImage("lenna.jpg");
-    TestImage("bad_quality.jpg", "so quality");
-    TestImage("tiny.jpg");
-    TestImage("chroma_halfed.jpg");
-    TestImage("grayscale.jpg");
-    TestImage("test.jpg");
-    TestImage("colors.jpg");
-    TestImage("save_for_web.jpg");
-    TestImage("prostitute.jpg");
-    TestImage("architecture.jpg");
-    TestImage("witch.jpg");
-    TestImage("huge.jpg");
+    std::vector<TestCase> test_cases = {
+        {        "small.jpg",         ":)"},
+        {        "lenna.jpg",           ""},
+        {  "bad_quality.jpg", "so quality"},
+        {         "tiny.jpg",           ""},
+        {"chroma_halfed.jpg",           ""},
+        {    "grayscale.jpg",           ""},
+        {         "test.jpg",           ""},
+        {       "colors.jpg",           ""},
+        { "save_for_web.jpg",           ""},
+        {   "prostitute.jpg",           ""},
+        { "architecture.jpg",           ""},
+        {        "witch.jpg",           ""},
+        {         "huge.jpg",           ""},
+    };
     const size_t tests_count = 24;
     for (size_t i = 1; i <= tests_count; ++i)
     {
-        TestImage("bad" + std::to_string(i) + ".jpg", "", true);
+        test_cases.push_back({"bad" + std::to_string(i) + ".jpg", "", true});
+    }
+    int failed = 0;
+    for (const auto& test_case : test_cases)
+    {
+        if (!TestImage(test_case.file, test_case.expected_comment, test_case.expect_error))
+        {
+            ++failed;
+        }
+    }
+    if (failed)
+    {
+        std::cout << failed << "/" << test_cases.size() << " test cases failed" << std::endl;
+    }
+    else
+    {
+        std::cout << "All " << test_cases.size() << " test cases passed" << std::endl;
     }
 }
